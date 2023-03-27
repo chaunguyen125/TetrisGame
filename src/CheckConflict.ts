@@ -1,8 +1,8 @@
 import { ActiveObject } from "./ActiveObject";
-import {  Board } from "./Interface";
+import { TBoard } from "./Interface";
 import shapes from "./Shape";
 
-const checkConflict =  (board: Board, activeObject: ActiveObject) => {
+const checkConflict =  (board: TBoard, activeObject: ActiveObject) => {
   let [row, col] = activeObject.position;
   let shapeData = shapes[activeObject.shapeIndex][activeObject.rotationIndex];
   // {

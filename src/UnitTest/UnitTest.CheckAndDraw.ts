@@ -2,10 +2,10 @@ import { Application, Container } from "pixi.js";
 import { ActiveObject } from "../ActiveObject";
 import Board, { moveObject } from "../Board";
 import checkConflict from "../CheckConflict";
-import { Board as IBoard } from "../Interface";
+import { TBoard } from "../Interface";
 
 export const drawNewActiveObject = async (
-  board: IBoard,
+  board: TBoard,
   row: number,
   col: number,
   shapeIndex:number,

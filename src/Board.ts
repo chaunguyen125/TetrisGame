@@ -2,10 +2,10 @@ import checkConflict from "./CheckConflict";
 import shapes from "./Shape";
 import * as PIXI from "pixi.js";
 import { ActiveObject } from "./ActiveObject";
-import { Board as IBoard } from "./Interface";
+import { TBoard } from "./Interface";
 
 class Board {
-  grid: IBoard
+  grid: TBoard
   cells: Record<string, PIXI.Sprite> = {}
   container: PIXI.Container
   // public static templateSprite: PIXI.Texture = null //templateSprite là một texture
@@ -51,9 +51,6 @@ class Board {
     if(this.cells[key]) delete this.cells[key]
   }
 
-  resetCell () {
-    this.cells = {}
-  }
 }
 
 

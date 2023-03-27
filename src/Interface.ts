@@ -7,4 +7,4 @@ export interface ShapeInfo {
 
 
 
-export type Board = number[][]
+export type TBoard = number[][]
