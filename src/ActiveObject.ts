@@ -60,6 +60,15 @@ export class ActiveObject {
     }
   }
 
- 
+  moveObject =  (obj: ActiveObject, row: number, col: number, rotate: number = 0) => {
+    // console.log('moveobjlog', obj);
+    
+    return {
+      position: [obj.position[0] + row, obj.position[1] + col],
+      shapeIndex: obj.shapeIndex,
+      rotationIndex: (obj.rotationIndex + rotate + 4) % 4,
+  
+    } as ActiveObject
+  }
 
 }

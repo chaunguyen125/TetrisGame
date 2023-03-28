@@ -1,7 +1,4 @@
-import checkConflict from "./CheckConflict";
-import shapes from "./Shape";
 import * as PIXI from "pixi.js";
-import { ActiveObject } from "./ActiveObject";
 import { TBoard } from "./Interface";
 
 class Board {
@@ -54,16 +51,7 @@ class Board {
 }
 
 
-export const moveObject =  (obj: ActiveObject, row: number, col: number, rotate: number = 0) => {
-  // console.log('moveobjlog', obj);
-  
-  return {
-    position: [obj.position[0] + row, obj.position[1] + col],
-    shapeIndex: obj.shapeIndex,
-    rotationIndex: (obj.rotationIndex + rotate + 4) % 4,
 
-  } as ActiveObject
-}
 
 // checkConflict(moveObject(activeObject, 1, 0, 0), board)
 

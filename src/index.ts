@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as PIXI from "pixi.js";
-import Board, { moveObject } from "./Board";
+import Board from "./Board";
 import { Container } from "pixi.js";
 import { ActiveObject } from "./ActiveObject";
 import shapes from "./Shape";
@@ -70,7 +70,7 @@ export class Main {
       if (!this.activeObj) return;
       let t = Date.now() / 1000 - this.to;
       if (t > 1) {
-        let newActiveObj = moveObject(this.activeObj, 1, 0, 0);
+        let newActiveObj = this.activeObj.moveObject(this.activeObj, 1, 0, 0);
 
         let check = checkConflict(this.board.grid, newActiveObj);
         if (check == true) {
@@ -187,7 +187,7 @@ export class Main {
 
     if (e.code === "ArrowLeft") {
       console.log("left");
-      let newActiveObj = moveObject(this.activeObj, 0, -1, 0);
+      let newActiveObj = this.activeObj.moveObject(this.activeObj, 0, -1, 0);
 
       let check = checkConflict(this.board.grid, newActiveObj);
       if (check == true) {
@@ -195,7 +195,7 @@ export class Main {
       }
     } else if (e.code === "ArrowRight") {
       console.log("right");
-      let newActiveObj = moveObject(this.activeObj, 0, 1, 0);
+      let newActiveObj = this.activeObj.moveObject(this.activeObj, 0, 1, 0);
 
       let check = checkConflict(this.board.grid, newActiveObj);
       if (check == true) {
@@ -203,7 +203,7 @@ export class Main {
       }
     } else if (e.code === "ArrowDown") {
       console.log("down");
-      let newActiveObj = moveObject(this.activeObj, 1, 0, 0);
+      let newActiveObj = this.activeObj.moveObject(this.activeObj, 1, 0, 0);
 
       let check = checkConflict(this.board.grid, newActiveObj);
       if (check == true) {
@@ -215,7 +215,7 @@ export class Main {
       }
     } else if (e.code === "ArrowUp") {
       console.log("up");
-      let newActiveObj = moveObject(this.activeObj, 0, 0, 1);
+      let newActiveObj = this.activeObj.moveObject(this.activeObj, 0, 0, 1);
 
       let check = checkConflict(this.board.grid, newActiveObj);
       if (check == true) {
