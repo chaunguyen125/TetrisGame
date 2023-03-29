@@ -49,7 +49,7 @@ export class ActiveObject {
       const rr = grid[r]
       for (let c = 0; c < rr.length; c++) {
         if (grid[r][c] == 1) {          
-          let sprite = PIXI.Sprite.from(this.blockStyle);
+          let sprite = new PIXI.Sprite(this.blockStyle);
           sprite.alpha = 1
           sprite.x = (c+this.position[1])*this.blockSize
           sprite.y = (r+this.position[0])*this.blockSize          

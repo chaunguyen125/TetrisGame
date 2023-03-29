@@ -1,7 +1,5 @@
 import * as _ from "lodash";
-import * as PIXI from "pixi.js";
 import Board from "./Board";
-import { Container } from "pixi.js";
 import { ActiveObject } from "./ActiveObject";
 import shapes from "./Shape";
 import checkConflict from "./CheckConflict";
@@ -15,10 +13,13 @@ export class Main {
   private to = Date.now() / 1000;
   private row: number = 20;
   private col: number = 15;
+  private combo: number = 0;
+  private score: number = 0;
+  private scoreContainer = new PIXI.Container();
   public constructor() {
     this.initApplication();
   }
-  createUIActiveObject = (container: Container) => {
+  createUIActiveObject = (container: PIXI.Container) => {
     let rotationIndex: number = Math.floor(Math.random() * 4);
     let shapeIndex = Math.floor(Math.random() * shapes.length);
 
@@ -37,7 +38,6 @@ export class Main {
       this.blockSize,
       blockStyle
     );
-    console.log("blockstyle", blockStyle);
     this.activeObj.updateCellPosition();
   }; //tạo mới active obj
 
@@ -93,9 +93,9 @@ export class Main {
           this.checkFullRow();
           isFullCol = this.checkFullCol();
           console.log("full col", isFullCol);
-          if (isFullCol) this.app.ticker.destroy();
+          if (isFullCol) this.app.ticker.stop();
         }
-
+        this.updateScore();
         this.to = Date.now() / 1000;
       }
     });
@@ -125,8 +125,17 @@ export class Main {
       if (count == rowData.length) {
         // xử lý data trên board gird
         this.updateDataIsFullRow(r);
+        ++this.combo;
+        console.log("combo", this.combo);
       }
     }
+  }
+
+  updateScore() {
+    let bonus = this.combo > 1 ? this.combo * 2 : 0;
+    this.score = this.score + this.combo * 10 + bonus;
+    console.log("combo, score", this.combo, this.score);
+    this.combo = 0;
   }
 
   updateDataIsFullRow(row: number) {
@@ -161,27 +170,45 @@ export class Main {
     }
   }
 
-  async imagesLoad() {
-    const imgFrames = [
-      "b-yellow.png",
-      "b-black.png",
-      "b-pink.png",
-      "b-red.png",
-      "b-brown.png",
-      "b-orange.png",
-      "b-blue.png",
-      "b-green.png",
-    ];
-    await PIXI.Assets.load("/assets/img/spritesheet.json").then(() => {
-      let l = imgFrames.length;
-      for (let i = 0; i < l; i++) {
-        const frameName = imgFrames[i];
-        this.imgBlock.push(PIXI.Texture.from(frameName));
-      }
+
+  imagesLoad(main: Main) {
+    return new Promise(function (resolve, reject) {
+      const imgFrames = [
+        "b-yellow.png",
+        "b-black.png",
+        "b-pink.png",
+        "b-red.png",
+        "b-brown.png",
+        "b-orange.png",
+        "b-blue.png",
+        "b-green.png",
+      ];
+  
+      let loader = PIXI.loader;
+      loader.add("load_block", "/assets/img/spritesheet.json");
+      loader.on("complete", () => {
+        let l = imgFrames.length;
+        for (let i = 0; i < l; i++) {
+          const frameName = imgFrames[i];
+          main.imgBlock.push(PIXI.Texture.from(frameName));
+          resolve(true);
+        }
+      });
+      loader.load();
+  
+      // await Assets.load("/assets/img/spritesheet.json").then(() => {
+      //   let l = imgFrames.length;
+      //   for (let i = 0; i < l; i++) {
+      //     const frameName = imgFrames[i];
+      //     this.imgBlock.push(PIXI.Texture.from(frameName));
+      //   }
+      // });
     });
   }
 
+
   async eventListenerClickButton(e: KeyboardEvent) {
+    // document.getElementsByTagName('body')[0].focus({ preventScroll: true })
     //lắng nghe các nút arrow
     if (!this.activeObj) return;
 
@@ -226,8 +253,6 @@ export class Main {
   }
 
   initPlayground = async () => {
-    console.log("app init playground", this.app);
-
     let width = this.blockSize * (this.col + 2);
     let height = this.blockSize * (this.row + 1);
 
@@ -235,23 +260,22 @@ export class Main {
     this.board.initContainer();
 
     this.board.container.x = width / 10;
-    this.board.container.y = height / 10;
+    this.board.container.y = height / 13;
 
     const graphic = new PIXI.Graphics();
-    graphic.beginFill("#fff");
+    graphic.beginFill(0xfff);
     graphic.drawRect(0, 0, width, height);
     graphic.alpha = 0.8;
     this.board.container.addChild(graphic);
+    this.initScore();
     this.app.stage.addChild(this.board.container);
     this.createUIActiveObject(this.board.container);
     this.initTicker();
   };
 
   async initGameBackground() {
-    console.log("app init background", this.app);
-
-    let width = window.innerWidth / 2;
-    let height = window.innerHeight / 1.5;
+    let width = window.innerWidth / 2.5;
+    let height = window.innerHeight / 1.6;
 
     this.app.renderer.view.width = width;
     this.app.renderer.view.height = height;
@@ -269,14 +293,43 @@ export class Main {
     document.body.appendChild(this.app.view);
   }
 
+  initScore() {
+    const containerWidth = this.board.container.width;
+    const containerHeight = this.board.container.height;
+    this.scoreContainer.x = containerWidth / 0.75;
+    this.scoreContainer.y = containerHeight / 7;
+
+    const graphic = new PIXI.Graphics();
+    graphic.beginFill(0xfff);
+    graphic.drawEllipse(0, 0, 60, 50);
+
+    console.log("score in init", this.score);
+
+    const scoreText = new PIXI.Text(`${this.score}`, {
+      fontFamily: "Arial",
+      fontSize: 24,
+      fill: 0xff1010,
+      align: "center",
+    });
+
+    this.scoreContainer.addChild(graphic);
+    this.scoreContainer.addChild(scoreText);
+    this.board.container.addChild(this.scoreContainer);
+  }
+
   initApplication() {
-    document.addEventListener("keydown", this.eventListenerClickButton.bind(this));
+    document.addEventListener(
+      "keydown",
+      this.eventListenerClickButton.bind(this)
+    );
     window.onload = async () => {
       this.app = new PIXI.Application();
-      console.log("app", this.app);
 
-      await this.imagesLoad();
-      this.initGameBackground();
+      this.imagesLoad(this).then(()=>{
+        this.initGameBackground()
+
+      }
+        );
     };
   }
 }
